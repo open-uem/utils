@@ -1,4 +1,4 @@
-package utils
+package openuem_utils
 
 import (
 	"bytes"
