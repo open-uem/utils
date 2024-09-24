@@ -5,13 +5,11 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
-	"crypto/x509/pkix"
 	"encoding/pem"
 	"fmt"
 	"math"
 	"math/big"
 	"os"
-	"time"
 )
 
 func GenerateSerialNumber() (*big.Int, error) {
@@ -119,29 +117,4 @@ func SavePrivateKey(certPrivKey *rsa.PrivateKey, path string) error {
 	}
 
 	return nil
-}
-
-func NewX509UserCertificate(username, organization, country, province, locality, address, postalCode string, yearsValid, monthsValid, daysValid int, ocspResponders []string, serverCert *x509.Certificate) (*x509.Certificate, error) {
-	serialNumber, err := GenerateSerialNumber()
-	if err != nil {
-		return nil, err
-	}
-	return &x509.Certificate{
-		SerialNumber: serialNumber,
-		Subject: pkix.Name{
-			CommonName:    username,
-			Organization:  []string{organization},
-			Country:       []string{country},
-			Province:      []string{province},
-			Locality:      []string{locality},
-			StreetAddress: []string{address},
-			PostalCode:    []string{postalCode},
-		},
-		Issuer:      serverCert.Subject,
-		NotBefore:   time.Now().Add(-5 * time.Minute).UTC(),
-		NotAfter:    time.Now().AddDate(yearsValid, monthsValid, daysValid),
-		ExtKeyUsage: []x509.ExtKeyUsage{x509.ExtKeyUsageClientAuth},
-		KeyUsage:    x509.KeyUsageDigitalSignature,
-		OCSPServer:  ocspResponders,
-	}, nil
 }
