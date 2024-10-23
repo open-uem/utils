@@ -8,15 +8,12 @@ import (
 )
 
 type OpenUEMWindowsService struct {
-	Logger       *OpenUEMLogger
 	ServiceStart func()
 	ServiceStop  func()
 }
 
-func NewOpenUEMWindowsService(logName string) *OpenUEMWindowsService {
-	return &OpenUEMWindowsService{
-		Logger: NewLogger(logName),
-	}
+func NewOpenUEMWindowsService() *OpenUEMWindowsService {
+	return &OpenUEMWindowsService{}
 }
 
 func (s *OpenUEMWindowsService) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
