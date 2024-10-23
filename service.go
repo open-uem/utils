@@ -13,7 +13,7 @@ type OpenUEMWindowsService struct {
 	ServiceStop  func()
 }
 
-func New(logName string) *OpenUEMWindowsService {
+func NewOpenUEMWindowsService(logName string) *OpenUEMWindowsService {
 	return &OpenUEMWindowsService{
 		Logger: NewLogger(logName),
 	}
