@@ -4,6 +4,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 type OpenUEMLogger struct {
@@ -26,8 +27,9 @@ func NewLogger(logFilename string) *OpenUEMLogger {
 		log.Fatalf("could not create log file: %v", err)
 	}
 
+	logPrefix := strings.TrimSuffix(filepath.Base(logFilename), filepath.Ext(logFilename))
 	log.SetOutput(logger.LogFile)
-	log.SetPrefix("openuem-agent: ")
+	log.SetPrefix(logPrefix + ": ")
 	log.SetFlags(log.Ldate | log.Ltime)
 
 	return &logger
