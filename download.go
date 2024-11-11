@@ -1,12 +1,13 @@
 package openuem_utils
 
 import (
+	"fmt"
 	"io"
 	"net/http"
 	"os"
 )
 
-func DownloadFile(url, filepath, hash string) error {
+func DownloadFile(url, filepath string, expectedHash []byte) error {
 
 	// Create the file
 	out, err := os.Create(filepath)
@@ -26,6 +27,17 @@ func DownloadFile(url, filepath, hash string) error {
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
 		return err
+	}
+
+	// Get hash
+	hash, err := GetSHA256Sum(filepath)
+	if err != nil {
+		return err
+	}
+
+	// Check hash
+	if string(hash) != string(expectedHash) {
+		return fmt.Errorf("checksum doesn't match")
 	}
 
 	return nil
