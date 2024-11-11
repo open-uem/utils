@@ -23,6 +23,10 @@ func DownloadFile(url, filepath string, expectedHash []byte) error {
 	}
 	defer resp.Body.Close()
 
+	if resp.StatusCode == http.StatusNotFound {
+		return fmt.Errorf("file not found")
+	}
+
 	// Write the body to file
 	_, err = io.Copy(out, resp.Body)
 	if err != nil {
@@ -34,8 +38,6 @@ func DownloadFile(url, filepath string, expectedHash []byte) error {
 	if err != nil {
 		return err
 	}
-
-	fmt.Printf("Expected: %s, Calculated: %s", expectedHash, hash)
 
 	// Check hash
 	if string(hash) != string(expectedHash) {
