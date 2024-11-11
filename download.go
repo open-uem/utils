@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-func DownloadFile(url, filepath string, expectedHash []byte) error {
+func DownloadFile(url, filepath string, expectedHash string) error {
 
 	// Create the file
 	out, err := os.Create(filepath)
@@ -40,7 +40,7 @@ func DownloadFile(url, filepath string, expectedHash []byte) error {
 	}
 
 	// Check hash
-	if string(hash) != string(expectedHash) {
+	if fmt.Sprintf("%x", hash) != expectedHash {
 		return fmt.Errorf("checksum doesn't match")
 	}
 
