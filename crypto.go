@@ -4,9 +4,11 @@ import (
 	"bytes"
 	"crypto/rand"
 	"crypto/rsa"
+	"crypto/sha256"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+	"io"
 	"math"
 	"math/big"
 	"os"
@@ -117,4 +119,19 @@ func SavePrivateKey(certPrivKey *rsa.PrivateKey, path string) error {
 	}
 
 	return nil
+}
+
+func GetSHA256Sum(filepath string) ([]byte, error) {
+	f, err := os.Open(filepath)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	h := sha256.New()
+	if _, err := io.Copy(h, f); err != nil {
+		return nil, err
+	}
+
+	return h.Sum(nil), nil
 }
