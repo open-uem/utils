@@ -49,6 +49,29 @@ loop:
 	return true, 0
 }
 
+func WindowsStartService(name string) error {
+	// Ref: https://cs.opensource.google/go/x/sys/+/refs/tags/v0.27.0:windows/svc/example/manage.go
+	m, err := mgr.Connect()
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := m.Disconnect(); err != nil {
+			log.Printf("[ERROR]: could not disconnect from manager: %v", err)
+		}
+	}()
+	s, err := m.OpenService(name)
+	if err != nil {
+		return fmt.Errorf("could not access service: %v", err)
+	}
+	defer s.Close()
+	err = s.Start("is", "manual-started")
+	if err != nil {
+		return fmt.Errorf("could not start service: %v", err)
+	}
+	return nil
+}
+
 func WindowsSvcControl(serviceName string, c svc.Cmd, to svc.State) error {
 	// Ref: https://cs.opensource.google/go/x/sys/+/refs/tags/v0.27.0:windows/svc/example/manage.go
 
@@ -56,7 +79,11 @@ func WindowsSvcControl(serviceName string, c svc.Cmd, to svc.State) error {
 	if err != nil {
 		return fmt.Errorf("could not connect with Windows service manager: %v", err)
 	}
-	defer m.Disconnect()
+	defer func() {
+		if err := m.Disconnect(); err != nil {
+			log.Printf("[ERROR]: could not disconnect from manager: %v", err)
+		}
+	}()
 
 	s, err := m.OpenService(serviceName)
 	if err != nil {
