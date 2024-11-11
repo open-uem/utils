@@ -35,7 +35,7 @@ func DownloadFile(url, filepath string, expectedHash []byte) error {
 		return err
 	}
 
-	fmt.Println("Expected: %s, Calculated: %s", expectedHash, hash)
+	fmt.Printf("Expected: %s, Calculated: %s", expectedHash, hash)
 
 	// Check hash
 	if string(hash) != string(expectedHash) {
