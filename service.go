@@ -1,10 +1,12 @@
 package openuem_utils
 
 import (
+	"fmt"
 	"log"
 	"time"
 
 	"golang.org/x/sys/windows/svc"
+	"golang.org/x/sys/windows/svc/mgr"
 )
 
 type OpenUEMWindowsService struct {
@@ -45,4 +47,37 @@ loop:
 	}
 	changes <- svc.Status{State: svc.StopPending}
 	return true, 0
+}
+
+func WindowsSvcControl(serviceName string, c svc.Cmd, to svc.State) error {
+	// Ref: https://cs.opensource.google/go/x/sys/+/refs/tags/v0.27.0:windows/svc/example/manage.go
+
+	m, err := mgr.Connect()
+	if err != nil {
+		return fmt.Errorf("could not connect with Windows service manager: %v", err)
+	}
+	defer m.Disconnect()
+
+	s, err := m.OpenService(serviceName)
+	if err != nil {
+		return fmt.Errorf("could not access service: %v", err)
+	}
+
+	status, err := s.Control(c)
+	if err != nil {
+		return fmt.Errorf("could not send control=%d: %v", c, err)
+	}
+
+	timeout := time.Now().Add(10 * time.Second)
+	for status.State != to {
+		if timeout.Before(time.Now()) {
+			return fmt.Errorf("timeout waiting for service to go to state=%d", to)
+		}
+		time.Sleep(300 * time.Millisecond)
+		status, err = s.Query()
+		if err != nil {
+			return fmt.Errorf("could not retrieve service status: %v", err)
+		}
+	}
+	return nil
 }
