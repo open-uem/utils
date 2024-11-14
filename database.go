@@ -1,3 +1,5 @@
+//go:build windows
+
 package openuem_utils
 
 import (
