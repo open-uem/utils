@@ -19,7 +19,7 @@ func NewLogger(logFilename string) *OpenUEMLogger {
 	logger := OpenUEMLogger{}
 
 	// Get executable path to store logs
-	wd := "/var/logs/openuem-server"
+	wd := "/var/log/openuem-server"
 
 	if _, err := os.Stat(wd); os.IsNotExist(err) {
 		if err := os.MkdirAll(wd, 0660); err != nil {
