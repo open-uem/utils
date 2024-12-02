@@ -48,7 +48,7 @@ func DownloadFile(url, filepath string, expectedHash string) error {
 	return nil
 }
 
-func QueryReleasesEndpoint(url, channel string) ([]byte, error) {
+func QueryReleasesEndpoint(url string) ([]byte, error) {
 	client := http.Client{
 		Timeout: time.Second * 8,
 	}
