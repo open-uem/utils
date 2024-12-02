@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 	"os"
+	"time"
 )
 
 func DownloadFile(url, filepath string, expectedHash string) error {
@@ -45,4 +46,33 @@ func DownloadFile(url, filepath string, expectedHash string) error {
 	}
 
 	return nil
+}
+
+func QueryReleasesEndpoint(url, channel string) ([]byte, error) {
+	client := http.Client{
+		Timeout: time.Second * 8,
+	}
+
+	req, err := http.NewRequest(http.MethodGet, url, nil)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Set("User-Agent", "openuem-console")
+
+	res, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.Body != nil {
+		defer res.Body.Close()
+	}
+
+	body, readErr := io.ReadAll(res.Body)
+	if readErr != nil {
+		return nil, err
+	}
+
+	return body, nil
 }
