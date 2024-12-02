@@ -1,3 +1,5 @@
+//go:build windows
+
 package openuem_utils
 
 import "golang.org/x/sys/windows/registry"
