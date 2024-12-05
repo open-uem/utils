@@ -7,39 +7,40 @@ import (
 	"fmt"
 
 	"github.com/danieljoos/wincred"
-	"golang.org/x/sys/windows/registry"
+	"gopkg.in/ini.v1"
 )
 
 func CreatePostgresDatabaseURL() (string, error) {
 	var err error
-	// Create DATABASE_URL env variable
-	k, err := registry.OpenKey(registry.LOCAL_MACHINE, `SOFTWARE\OpenUEM\Server`, registry.QUERY_VALUE)
-	if err != nil {
-		return "", fmt.Errorf("could not open registry to search OpenUEM Server entries")
-	}
-	defer k.Close()
 
-	user, _, err := k.GetStringValue("PostgresUser")
+	// Open ini file
+	configFile := GetConfigFile()
+	cfg, err := ini.Load(configFile)
 	if err != nil {
-		return "", fmt.Errorf("could not read PostgresUser from registry")
+		return "", err
 	}
 
-	host, _, err := k.GetStringValue("PostgresHost")
+	user, err := cfg.Section("DB").GetKey("PostgresUser")
 	if err != nil {
-		return "", fmt.Errorf("could not read PostgresHost from registry")
+		return "", fmt.Errorf("could not read PostgresUser from INI")
 	}
 
-	port, _, err := k.GetStringValue("PostgresPort")
+	host, err := cfg.Section("DB").GetKey("PostgresHost")
 	if err != nil {
-		return "", fmt.Errorf("could not read PostgresPort from registry")
+		return "", fmt.Errorf("could not read PostgresHost from INI")
 	}
 
-	database, _, err := k.GetStringValue("PostgresDatabase")
+	port, err := cfg.Section("DB").GetKey("PostgresPort")
 	if err != nil {
-		return "", fmt.Errorf("could not read PostgresDatabase from registry")
+		return "", fmt.Errorf("could not read PostgresPort from INI")
 	}
 
-	pass, err := wincred.GetGenericCredential(host + ":" + port)
+	database, err := cfg.Section("DB").GetKey("PostgresDatabase")
+	if err != nil {
+		return "", fmt.Errorf("could not read PostgresDatabase from INI")
+	}
+
+	pass, err := wincred.GetGenericCredential(host.String() + ":" + port.String())
 	if err != nil {
 		return "", fmt.Errorf("could not read password from Windows Credential Manager")
 	}

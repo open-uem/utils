@@ -7,4 +7,4 @@ require (
 	golang.org/x/sys v0.26.0
 )
 
-require gopkg.in/ini.v1 v1.67.0 // indirect
+require gopkg.in/ini.v1 v1.67.0
