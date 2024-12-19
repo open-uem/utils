@@ -16,7 +16,7 @@ func GetJWTKey() (string, error) {
 		return "", err
 	}
 
-	key, err := cfg.Section("JWT").GetKey("key")
+	key, err := cfg.Section("JWT").GetKey("Key")
 	if err != nil {
 		return "", fmt.Errorf("could not read PostgresDatabase from INI")
 	}
