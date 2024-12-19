@@ -15,7 +15,7 @@ func CreatePostgresDatabaseURL() (string, error) {
 		return "", err
 	}
 
-	key, err := cfg.Section("Server").GetKey("db_url")
+	key, err := cfg.Section("DB").GetKey("PostgresUrl")
 	if err != nil {
 		return "", err
 	}
