@@ -1,6 +1,6 @@
 //go:build linux
 
-package openuem_utils
+package utils
 
 func GetConfigFile() string {
 	return "/etc/openuem-server/openuem.ini"

@@ -1,6 +1,6 @@
 //go:build linux
 
-package openuem_utils
+package utils
 
 import (
 	"gopkg.in/ini.v1"

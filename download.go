@@ -1,4 +1,4 @@
-package openuem_utils
+package utils
 
 import (
 	"fmt"

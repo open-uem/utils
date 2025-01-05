@@ -1,6 +1,6 @@
 //go:build windows
 
-package openuem_utils
+package utils
 
 import (
 	"fmt"
