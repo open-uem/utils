@@ -15,3 +15,7 @@ func GetConfigFile() string {
 
 	return filepath.Join(wd, "config", "openuem.ini")
 }
+
+func GetAgentConfigFile() string {
+	return GetConfigFile()
+}
