@@ -137,9 +137,9 @@ func GetSHA256Sum(filepath string) ([]byte, error) {
 }
 
 // Ref: https://gist.github.com/dopey/c69559607800d2f2f90b1b1ed4e550fb
-func GenerateRandomPIN() (string, error) {
+func GenerateRandomPIN(length int) (string, error) {
 	const numbers = "0123456789"
-	pin := make([]byte, 6)
+	pin := make([]byte, length)
 
 	for i := 0; i < 6; i++ {
 		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(numbers))))
