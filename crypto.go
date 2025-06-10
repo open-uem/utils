@@ -141,7 +141,7 @@ func GenerateRandomPIN(length int) (string, error) {
 	const numbers = "0123456789"
 	pin := make([]byte, length)
 
-	for i := 0; i < 6; i++ {
+	for i := range length - 1 {
 		num, err := rand.Int(rand.Reader, big.NewInt(int64(len(numbers))))
 		if err != nil {
 			return "", err
