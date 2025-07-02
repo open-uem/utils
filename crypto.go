@@ -5,15 +5,15 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
-	"crypto/sha512"
 	"crypto/x509"
-	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"io"
 	"math"
 	"math/big"
 	"os"
+
+	"github.com/tredoe/osutil/user/crypt"
 )
 
 func GenerateSerialNumber() (*big.Int, error) {
@@ -154,12 +154,7 @@ func GenerateRandomPIN(length int) (string, error) {
 	return string(pin), nil
 }
 
-func GenerateSHA512(data string) (string, error) {
-	hash := sha512.New()
-	if _, err := hash.Write([]byte(data)); err != nil {
-		return "", err
-	}
-
-	hashedData := hash.Sum(nil)
-	return hex.EncodeToString(hashedData), nil
+func GenerateLinuxPasswordSHA512(data string) (string, error) {
+	c := crypt.New(crypt.SHA512)
+	return c.Generate([]byte(data), []byte(""))
 }
