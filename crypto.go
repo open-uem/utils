@@ -12,8 +12,6 @@ import (
 	"math"
 	"math/big"
 	"os"
-
-	"github.com/tredoe/osutil/user/crypt"
 )
 
 func GenerateSerialNumber() (*big.Int, error) {
@@ -152,9 +150,4 @@ func GenerateRandomPIN(length int) (string, error) {
 	}
 
 	return string(pin), nil
-}
-
-func GenerateLinuxPasswordSHA512(data string) (string, error) {
-	c := crypt.New(crypt.SHA512)
-	return c.Generate([]byte(data), []byte(""))
 }

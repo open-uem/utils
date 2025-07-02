@@ -8,5 +8,3 @@ require (
 )
 
 require gopkg.in/ini.v1 v1.67.0
-
-require github.com/tredoe/osutil v1.5.0 // indirect
