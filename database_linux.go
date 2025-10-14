@@ -4,7 +4,6 @@ package utils
 
 import (
 	"fmt"
-	"log"
 	"net/url"
 	"text/template"
 
@@ -48,8 +47,7 @@ func CreatePostgresDatabaseURL() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("could not read password from Windows Credential Manager")
 	}
-	password := url.PathEscape(pass.String())
-	log.Println(pass.String(), password, url.QueryEscape(pass.String()), template.URLQueryEscaper(pass.String()))
+	password := template.URLQueryEscaper(pass.String())
 
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", username, password, hostname, dbPort, databaseName), nil
 
