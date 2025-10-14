@@ -6,6 +6,7 @@ import (
 	"encoding/binary"
 	"fmt"
 	"net/url"
+	"text/template"
 
 	"github.com/danieljoos/wincred"
 	"gopkg.in/ini.v1"
@@ -51,7 +52,7 @@ func CreatePostgresDatabaseURL() (string, error) {
 	}
 	decodedPass := UTF16BytesToString(pass.CredentialBlob, binary.LittleEndian)
 
-	password := url.PathEscape(decodedPass)
+	password := template.URLQueryEscaper(decodedPass)
 
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", username, password, hostname, dbPort, databaseName), nil
 }
