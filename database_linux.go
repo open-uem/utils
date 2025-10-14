@@ -4,6 +4,7 @@ package utils
 
 import (
 	"fmt"
+	"log"
 	"net/url"
 
 	"gopkg.in/ini.v1"
@@ -47,6 +48,7 @@ func CreatePostgresDatabaseURL() (string, error) {
 		return "", fmt.Errorf("could not read password from Windows Credential Manager")
 	}
 	password := url.PathEscape(pass.String())
+	log.Println(password, url.QueryEscape(pass.String()))
 
 	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", username, password, hostname, dbPort, databaseName), nil
 
