@@ -3,7 +3,6 @@
 package utils
 
 import (
-	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -53,7 +52,7 @@ func NewAuthLogger() *log.Logger {
 
 	f, err := os.OpenFile(filepath.Join(wd, "openuem-auth"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0660)
 	if err != nil {
-		fmt.Println("auth log file not created", err.Error())
+		log.Fatalf("[FATAL]: auth log file not created, reason: %v", err)
 	}
 	return log.New(f, "", log.Ldate|log.Ltime)
 }
