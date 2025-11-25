@@ -3,6 +3,7 @@
 package utils
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -39,6 +40,22 @@ func NewLogger(logFilename string) *OpenUEMLogger {
 	log.SetFlags(log.Ldate | log.Ltime)
 
 	return &logger
+}
+
+func NewAuthLogger() *log.Logger {
+	wd := "/var/log/openuem-server"
+
+	if _, err := os.Stat(wd); os.IsNotExist(err) {
+		if err := os.MkdirAll(wd, 0660); err != nil {
+			log.Fatalf("[FATAL]: could not create log directory, reason: %v", err)
+		}
+	}
+
+	f, err := os.OpenFile(filepath.Join(wd, "openuem-auth"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0660)
+	if err != nil {
+		fmt.Println("auth log file not created", err.Error())
+	}
+	return log.New(f, "", log.Ldate|log.Ltime)
 }
 
 func (l *OpenUEMLogger) Close() {
