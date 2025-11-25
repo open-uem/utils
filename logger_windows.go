@@ -55,7 +55,7 @@ func NewAuthLogger() *log.Logger {
 		}
 	}
 
-	f, err := os.OpenFile(filepath.Join(wd, "openuem-auth"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0660)
+	f, err := os.OpenFile(filepath.Join(wd, "openuem-auth.txt"), os.O_RDWR|os.O_CREATE|os.O_APPEND, 0660)
 	if err != nil {
 		log.Fatalf("[FATAL]: auth log file not created, reason: %v", err)
 	}
