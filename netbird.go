@@ -27,6 +27,10 @@ type NetBirdCreateSetupKeyResponse struct {
 	Key                 string   `json:"key"`
 }
 
+type NetBirdPeer struct {
+	ID string `json:"id"`
+}
+
 func CreateNetBirdOneOffSetupKeyAPI(managementURL string, agentID string, groups string, allowExtraDNSLabels bool, token string) (string, string, error) {
 
 	url := fmt.Sprintf("%s/api/setup-keys", managementURL)
@@ -79,6 +83,77 @@ func CreateNetBirdOneOffSetupKeyAPI(managementURL string, agentID string, groups
 
 func DeleteNetBirdOneOffSetupKeyAPI(managementURL string, key string, token string) error {
 	url := fmt.Sprintf("%s/api/setup-keys/%s", managementURL, key)
+
+	method := "DELETE"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+
+	if err != nil {
+		return err
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("Token %s", token))
+
+	res, err := client.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	return nil
+}
+
+func GetMyNetBirdPeerID(ip string, managementURL string, token string) (string, error) {
+
+	url := fmt.Sprintf("%s/api/peers?ip=%s", managementURL, ip)
+
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Authorization", fmt.Sprintf("Token %s", token))
+
+	res, err := client.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return "", err
+	}
+
+	peers := []NetBirdPeer{}
+	if err := json.Unmarshal(body, &peers); err != nil {
+		return "", err
+	}
+
+	if len(peers) == 0 {
+		return "", errors.New("the API didn't find a peer with this IP address")
+	}
+
+	if len(peers) > 2 {
+		return "", errors.New("the API found more than one peer with this IP address")
+	}
+
+	if peers[0].ID == "" {
+		return "", errors.New("could not get the peer ID from the API")
+	}
+
+	return peers[0].ID, nil
+}
+
+func DeleteNetBirdPeer(peerID string, managementURL string, token string) error {
+
+	url := fmt.Sprintf("%s/api/peers/%s", managementURL, peerID)
 
 	method := "DELETE"
 
