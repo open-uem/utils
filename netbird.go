@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -200,6 +201,8 @@ func NetBirdPeerExists(name string, managementURL string, token string) (bool, e
 	if err != nil {
 		return false, err
 	}
+
+	log.Println("Body: ", string(body))
 
 	peers := []NetBirdPeer{}
 	if err := json.Unmarshal(body, &peers); err != nil {
