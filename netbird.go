@@ -178,7 +178,7 @@ func DeleteNetBirdPeer(peerID string, managementURL string, token string) error 
 
 func NetBirdPeerExists(name string, managementURL string, token string) (bool, error) {
 
-	url := fmt.Sprintf("%s/api/peers/%s?name=", managementURL, name)
+	url := fmt.Sprintf("%s/api/peers?name=%s", managementURL, name)
 
 	method := "GET"
 
