@@ -174,3 +174,37 @@ func DeleteNetBirdPeer(peerID string, managementURL string, token string) error 
 
 	return nil
 }
+
+func NetBirdPeerExists(name string, managementURL string, token string) (bool, error) {
+
+	url := fmt.Sprintf("%s/api/peers/%s?name=", managementURL, name)
+
+	method := "GET"
+
+	client := &http.Client{}
+	req, err := http.NewRequest(method, url, nil)
+
+	if err != nil {
+		return false, err
+	}
+
+	req.Header.Add("Authorization", fmt.Sprintf("Token %s", token))
+
+	res, err := client.Do(req)
+	if err != nil {
+		return false, err
+	}
+	defer res.Body.Close()
+
+	body, err := io.ReadAll(res.Body)
+	if err != nil {
+		return false, err
+	}
+
+	peers := []NetBirdPeer{}
+	if err := json.Unmarshal(body, &peers); err != nil {
+		return false, err
+	}
+
+	return len(peers) > 0, nil
+}
