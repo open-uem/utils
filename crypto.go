@@ -156,6 +156,7 @@ func GenerateRandomPIN(length int) (string, error) {
 	return string(pin), nil
 }
 
+// Reference: https://www.twilio.com/en-us/blog/developers/community/encrypt-and-decrypt-data-in-go-with-aes-256
 func EncryptSensitiveField(plaintext string, key string) (string, error) {
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
@@ -181,6 +182,7 @@ func EncryptSensitiveField(plaintext string, key string) (string, error) {
 	return enc, nil
 }
 
+// Reference: https://www.twilio.com/en-us/blog/developers/community/encrypt-and-decrypt-data-in-go-with-aes-256
 func DecryptSensitiveField(enc string, key string) (string, error) {
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
@@ -209,6 +211,7 @@ func DecryptSensitiveField(enc string, key string) (string, error) {
 	return string(decryptedData), nil
 }
 
+// Reference: https://www.twilio.com/en-us/blog/developers/community/encrypt-and-decrypt-data-in-go-with-aes-256
 func IsSensitiveFieldEncrypted(enc string, key string) (bool, error) {
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
