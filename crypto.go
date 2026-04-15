@@ -2,13 +2,17 @@ package utils
 
 import (
 	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/sha256"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/pem"
 	"fmt"
 	"io"
+	"log"
 	"math"
 	"math/big"
 	"os"
@@ -150,4 +154,80 @@ func GenerateRandomPIN(length int) (string, error) {
 	}
 
 	return string(pin), nil
+}
+
+func EncryptSensitiveField(plaintext string, key string) (string, error) {
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		log.Printf("[ERROR]: error creating aes block cipher, reason: %v", err)
+		return "", err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		log.Printf("[ERROR]: error setting gcm mode, reason: %v", err)
+		return "", err
+	}
+
+	nonce := make([]byte, gcm.NonceSize())
+	if _, err := io.ReadFull(rand.Reader, nonce); err != nil {
+		log.Printf("[ERROR]: error  generating the nonce, reason: %v", err)
+		return "", err
+	}
+
+	ciphertext := gcm.Seal(nonce, nonce, []byte(plaintext), nil)
+	enc := hex.EncodeToString(ciphertext)
+
+	return enc, nil
+}
+
+func DecryptSensitiveField(enc string, key string) (string, error) {
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		log.Printf("[ERROR]: error creating aes block cipher, reason: %v", err)
+		return "", err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		log.Printf("[ERROR]: error setting gcm mode, reason: %v", err)
+		return "", err
+	}
+
+	decodedCipherText, err := hex.DecodeString(enc)
+	if err != nil {
+		log.Printf("[ERROR]: error decoding hex, reason: %v", err)
+		return "", err
+	}
+
+	decryptedData, err := gcm.Open(nil, decodedCipherText[:gcm.NonceSize()], decodedCipherText[gcm.NonceSize():], nil)
+	if err != nil {
+		log.Printf("[ERROR]: error decrypting data, reason: %v", err)
+		return "", err
+	}
+
+	return string(decryptedData), nil
+}
+
+func IsSensitiveFieldEncrypted(enc string, key string) (bool, error) {
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return false, err
+	}
+
+	gcm, err := cipher.NewGCM(block)
+	if err != nil {
+		return false, err
+	}
+
+	decodedCipherText, err := hex.DecodeString(enc)
+	if err != nil {
+		return false, nil
+	}
+
+	if _, err := gcm.Open(nil, decodedCipherText[:gcm.NonceSize()], decodedCipherText[gcm.NonceSize():], nil); err != nil {
+		return false, nil
+	}
+
+	return true, nil
 }
