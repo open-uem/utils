@@ -213,6 +213,10 @@ func DecryptSensitiveField(enc string, key string) (string, error) {
 
 // Reference: https://www.twilio.com/en-us/blog/developers/community/encrypt-and-decrypt-data-in-go-with-aes-256
 func IsSensitiveFieldEncrypted(enc string, key string) (bool, error) {
+	if enc == "" {
+		return false, nil
+	}
+
 	block, err := aes.NewCipher([]byte(key))
 	if err != nil {
 		return false, err
