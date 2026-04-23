@@ -1,4 +1,4 @@
-module github.com/open-uem/utils
+module github.com/EigerCode/utils
 
 go 1.26.0
 
