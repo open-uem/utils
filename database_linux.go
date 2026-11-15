@@ -4,8 +4,6 @@ package utils
 
 import (
 	"fmt"
-	"net/url"
-	"text/template"
 
 	"gopkg.in/ini.v1"
 )
@@ -23,32 +21,26 @@ func CreatePostgresDatabaseURL() (string, error) {
 	if err != nil {
 		return "", fmt.Errorf("could not read PostgresUser from INI")
 	}
-	username := url.PathEscape(user.String())
 
 	host, err := cfg.Section("DB").GetKey("PostgresHost")
 	if err != nil {
 		return "", fmt.Errorf("could not read PostgresHost from INI")
 	}
-	hostname := url.PathEscape(host.String())
 
 	port, err := cfg.Section("DB").GetKey("PostgresPort")
 	if err != nil {
 		return "", fmt.Errorf("could not read PostgresPort from INI")
 	}
-	dbPort := url.PathEscape(port.String())
 
 	database, err := cfg.Section("DB").GetKey("PostgresDatabase")
 	if err != nil {
 		return "", fmt.Errorf("could not read PostgresDatabase from INI")
 	}
-	databaseName := url.PathEscape(database.String())
 
 	pass, err := cfg.Section("DB").GetKey("PostgresPassword")
 	if err != nil {
-		return "", fmt.Errorf("could not read password from Windows Credential Manager")
+		return "", fmt.Errorf("could not read PostgresPassword from INI")
 	}
-	password := template.URLQueryEscaper(pass.String())
 
-	return fmt.Sprintf("postgres://%s:%s@%s:%s/%s", username, password, hostname, dbPort, databaseName), nil
-
+	return postgresDatabaseURL(user.String(), pass.String(), host.String(), port.String(), database.String()), nil
 }
