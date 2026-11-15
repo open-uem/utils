@@ -33,7 +33,7 @@ func ReadPEMCertificate(path string) (*x509.Certificate, error) {
 	}
 
 	certBlock, _ := pem.Decode(certBytes)
-	if certBlock.Type != "CERTIFICATE" || certBlock.Bytes == nil {
+	if certBlock == nil || certBlock.Type != "CERTIFICATE" || certBlock.Bytes == nil {
 		return nil, fmt.Errorf("file does not content a certificate")
 	}
 
@@ -52,15 +52,30 @@ func ReadPEMPrivateKey(path string) (*rsa.PrivateKey, error) {
 	}
 
 	privKeyBlock, _ := pem.Decode(privKeyBytes)
-	if privKeyBlock.Type != "RSA PRIVATE KEY" || privKeyBlock.Bytes == nil {
+	if privKeyBlock == nil || privKeyBlock.Bytes == nil {
 		return nil, fmt.Errorf("file does not content a private key")
 	}
 
-	privKey, err := x509.ParsePKCS1PrivateKey(privKeyBlock.Bytes)
-	if err != nil {
-		return nil, err
+	switch privKeyBlock.Type {
+	case "RSA PRIVATE KEY":
+		return x509.ParsePKCS1PrivateKey(privKeyBlock.Bytes)
+	case "PRIVATE KEY":
+		key, err := x509.ParsePKCS8PrivateKey(privKeyBlock.Bytes)
+		if err != nil {
+			return nil, err
+		}
+		privKey, ok := key.(*rsa.PrivateKey)
+		if !ok {
+			return nil, fmt.Errorf("file contains a %T private key, but an RSA private key is required", key)
+		}
+		return privKey, nil
+	case "EC PRIVATE KEY":
+		return nil, fmt.Errorf("file contains an EC private key, but an RSA private key is required")
+	case "ENCRYPTED PRIVATE KEY":
+		return nil, fmt.Errorf("file contains an encrypted private key, please provide an unencrypted PEM key")
+	default:
+		return nil, fmt.Errorf("file does not content a private key")
 	}
-	return privKey, nil
 }
 
 func savePEM(buf *bytes.Buffer, path string) error {
